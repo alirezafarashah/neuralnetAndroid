@@ -1,71 +1,107 @@
 package com.example.feedforward;
 
-import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.IntentService;
+import android.Manifest;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    EditText number1;
-    EditText number2;
-    Button Add_button;
-    TextView result;
-    TextView message;
+    public static final Integer RecordAudioRequestCode = 1;
+    private SpeechRecognizer speechRecognizer;
+    private EditText editText;
+    private TextView res;
 
-    protected void onCreate(Bundle savedInstanceState) {
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FileReader.mainActivity = this;
+        try {
+            FileReader.loadUtils();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         setContentView(R.layout.activity_main);
-        number1 = (EditText) findViewById(R.id.editText_first_no);
-        number2 = (EditText) findViewById(R.id.editText_second_no);
-        Add_button = (Button) findViewById(R.id.add_button);
-        result = (TextView) findViewById(R.id.textView_answer);
-        message = (TextView) findViewById(R.id.textView_message);
-        Add_button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                new AsyncTaskRunner(number1,number2,message,result).execute();
-                /*int num1 = Integer.parseInt(number1.getText().toString());
-                int num2 = Integer.parseInt(number2.getText().toString());
-                message.setText("your execution started, please wait");
-                double startTime = System.currentTimeMillis();
-                Main.main(num2, num1);
-                double endTime = System.currentTimeMillis();
-                result.setText(Double.toString(endTime - startTime) + " ms");
-                message.setText("finished");*/
-            }
-        });
-    }
-}
-class AsyncTaskRunner extends AsyncTask<Void,Void,Double> {
-    public EditText number1;
-    public EditText number2;
-    public TextView result;
-    public TextView message;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            checkPermission();
+        }
 
-    public AsyncTaskRunner(EditText number1 , EditText number2 , TextView message,
-                           TextView result) {
-        this.number1 = number1;
-        this.number2 = number2;
-        this.message = message;
-        this.result = result;
+        editText = findViewById(R.id.text);
+        res = findViewById(R.id.result);
+        ImageView micButton = findViewById(R.id.button);
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        micButton.setOnClickListener(v -> {
+            final Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fa");
+            startActivityForResult(speechRecognizerIntent, RecordAudioRequestCode);
+        });
+
+
     }
 
     @Override
-    protected Double doInBackground(Void... params) {
-        int num1 = Integer.parseInt(number1.getText().toString());
-        int num2 = Integer.parseInt(number2.getText().toString());
-        message.setText("your execution started, please wait");
-        double startTime = System.currentTimeMillis();
-        Main.main(num2, num1);
-        double endTime = System.currentTimeMillis();
-        result.setText(Double.toString(endTime - startTime) + " ms");
-        message.setText("finished");
-        return endTime;
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        String sentence = "";
+        if (requestCode == RecordAudioRequestCode && resultCode == RESULT_OK) {
+            assert data != null;
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            editText.setText(matches.get(0));
+            sentence = matches.get(0);
+
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+        setCategory(sentence);
     }
 
+    protected void setCategory(String sentence) {
+        int answer;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                answer = FileReader.main(sentence);
+                res.setText(Categories.values()[answer].toString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        speechRecognizer.destroy();
+    }
+
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RecordAudioRequestCode);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == RecordAudioRequestCode && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

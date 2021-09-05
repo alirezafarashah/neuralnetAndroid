@@ -2,78 +2,52 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    tools:layout_editor_absoluteY="81dp">
+    android:background="@android:color/holo_orange_light"
+    tools:context=".MainActivity">
 
-    <!--take the input first number-->
-
-    <TextView
-        android:id="@+id/textView_answer"
-        android:layout_width="100dp"
-        android:layout_height="25dp"
-        android:layout_marginLeft="130dp"
-        android:layout_marginTop="300dp"
-        android:text="0"
-        android:textSize="20dp"
-        android:textStyle="bold" />
-
-    <EditText
-        android:id="@+id/editText_first_no"
-        android:layout_width="150dp"
-        android:layout_height="40dp"
-        android:layout_marginLeft="200dp"
-        android:layout_marginTop="40dp"
-        android:inputType="number" />
-    <!-- for messege input first number-->
-    <TextView
-        android:id="@+id/textView_first_no"
-        android:layout_width="150dp"
-        android:layout_height="25dp"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
+
+        <EditText
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="15dp"
+            android:layout_toLeftOf="@id/button"
+            android:hint="Tap to Speak"
+            android:padding="10dp"
+            android:textColor="@color/black" />
+
+        <ImageView
+            android:id="@+id/button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:backgroundTint="#F9F8FA"
+            android:paddingRight="10dp"
+            android:src="@drawable/ic_mic_black_off" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginLeft="100dp"
         android:layout_marginTop="50dp"
-        android:text="neurons"
-        android:textSize="20dp" />
+        android:layout_marginEnd="100dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginBottom="-100dp"
+        android:text="result"
+        android:textColor="@color/black" />
 
-    <!--view messege -->
-    <TextView
-        android:id="@+id/textView_second_no"
-        android:layout_width="150dp"
-        android:layout_height="25dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="100dp"
-        android:text="layers"
-        android:textSize="20dp" />
-
-    <!-- take input for second number -->
-
-    <EditText
-        android:id="@+id/editText_second_no"
-        android:layout_width="150dp"
-        android:layout_height="40dp"
-        android:layout_marginLeft="200dp"
-        android:layout_marginTop="90dp"
-        android:inputType="number"
-        tools:ignore="MissingConstraints" />
-
-    <!-- button for run add logic and view result -->
-
-    <Button
-        android:id="@+id/add_button"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft="110dp"
-        android:layout_marginTop="200dp"
-        android:text="RUN" />
-
-    <TextView
-        android:id="@+id/textView_message"
-        android:layout_width="350dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft="40dp"
-        android:layout_marginTop="350dp"
-        android:visibility="visible"
-        tools:visibility="visible" />
 
 </RelativeLayout>

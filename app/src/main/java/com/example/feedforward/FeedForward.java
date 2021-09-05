@@ -9,36 +9,37 @@ public class FeedForward {
     private final ArrayList<Integer> numberOfLayersNeuron;
     private final int numberOfLayers;
     private final ActivationFunction af;
+    private final ArrayList<ArrayList<Double>> biases;
 
-    FeedForward(ArrayList<Double> features, ArrayList<ArrayList<ArrayList<Double>>> weights,
+    FeedForward(ArrayList<Double> features, ArrayList<ArrayList<ArrayList<Double>>> weights, ArrayList<ArrayList<Double>> biases,
                 ArrayList<Integer> numberOfLayersNeuron, int numberOfLayers, ActivationFunction af) {
         this.features = features;
         this.weights = weights;
         this.numberOfLayers = numberOfLayers;
         this.numberOfLayersNeuron = numberOfLayersNeuron;
         this.af = af;
+        this.biases = biases;
 
     }
 
     public double[] forward() {
-        ArrayList<Double> nextFeature = new ArrayList<>();
         for (int i = 0; i < numberOfLayers; i++) {
+            ArrayList<Double> nextFeature = new ArrayList<>();
             for (int j = 0; j < numberOfLayersNeuron.get(i); j++) {
-                ArrayList<Double> weightsOfLayer = weights.get(i).get(j);
                 double neuronValue = 0;
                 int k = 0;
                 for (Double feature : features) {
-                    neuronValue = neuronValue + (feature * weightsOfLayer.get(k));
+                    neuronValue = neuronValue + (feature * weights.get(i).get(k).get(j));
                     k++;
                 }
-                nextFeature.add(af.activation(neuronValue));
+                neuronValue += biases.get(i).get(j);
+                if (i != numberOfLayers - 1) {
+                    neuronValue = af.activation(neuronValue);
+                }
+                nextFeature.add(neuronValue);
             }
             features.clear();
-            System.gc();
-            features.addAll(nextFeature);
-            nextFeature.clear();
-            System.gc();
-
+            features = nextFeature;
         }
         return softMax(features);
     }

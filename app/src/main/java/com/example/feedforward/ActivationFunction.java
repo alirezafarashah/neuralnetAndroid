@@ -1,4 +1,5 @@
 package com.example.feedforward;
+
 public class ActivationFunction {
     public double activation(double input){
         if (input > 0){

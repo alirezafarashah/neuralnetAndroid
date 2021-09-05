@@ -5,7 +5,7 @@ plugins {
 android {
     compileSdkVersion 30
     buildToolsVersion
-
+    useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.example.feedforward"
         minSdkVersion 21
@@ -15,6 +15,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
 
     buildTypes {
         release {
@@ -32,6 +33,7 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
+    implementation 'org.apache.commons:commons-lang3:3.6'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
