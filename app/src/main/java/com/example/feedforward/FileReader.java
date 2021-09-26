@@ -30,7 +30,7 @@ public class FileReader {
         stopWords = loadStopWords();
         weights = getWeights();
         biases = getBiases();
-        //ID2Vectors = readID2Vectors();
+        ID2Vectors = readID2Vectors();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -59,6 +59,12 @@ public class FileReader {
                 tokens.add(stem);
             }
         }
+        for (String token : tokens) {
+            if (token2ID.containsKey(token)) {
+                sentence.add(token2ID.get(token));
+            }
+        }
+        /*
         for (int i = 0; i < 15; i++) {
             if (i < tokens.size() && token2ID.containsKey(tokens.get(i))) {
                 sentence.add(token2ID.get(tokens.get(i)));
@@ -66,6 +72,7 @@ public class FileReader {
                 sentence.add(0);
             }
         }
+        */
 
         return sentence;
 
@@ -74,7 +81,7 @@ public class FileReader {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static int run(ArrayList<Integer> sentence) throws IOException {
         ArrayList<ArrayList<Double>> vectors;
-        vectors = getId2Vector(sentence);
+        vectors = getId2Vector2(sentence);
         int numberOfLayers = 2;
         int[] numberOfNeurons = {50, 39};
         ArrayList<Integer> numberOfLayersNeuron = new ArrayList<>();
@@ -217,15 +224,16 @@ public class FileReader {
 
 
     private static HashMap<Integer, ArrayList<Double>> readID2Vectors() throws IOException {
-        InputStream vectorFile = mainActivity.getAssets().open("emb.txt");
+        InputStream vectorFile = mainActivity.getAssets().open("emb3.txt");
         Scanner scannerVectors = new Scanner(vectorFile);
         String line = null;
+        int i;
         HashMap<Integer, ArrayList<Double>> result = new HashMap<>();
-        int i = 0;
         while (scannerVectors.hasNextLine()) {
             line = scannerVectors.nextLine();
+            i = Integer.parseInt(line.split(":")[0]);
+            line = line.split(":")[1];
             result.put(i, lineToArray2(line));
-            i++;
 
         }
         scannerVectors.close();
@@ -258,6 +266,20 @@ public class FileReader {
         vectorFile.close();
         for (Integer id : sentence) {
             vectors.add(temp.get(id));
+        }
+        return vectors;
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private static ArrayList<ArrayList<Double>> getId2Vector2(ArrayList<Integer> sentence) throws IOException {
+        ArrayList<ArrayList<Double>> vectors = new ArrayList<>();
+        for (Integer id : sentence) {
+            if (ID2Vectors.containsKey(id)) {
+                vectors.add(ID2Vectors.get(id));
+            } else {
+                vectors.add(ID2Vectors.get(0));
+            }
         }
         return vectors;
 
